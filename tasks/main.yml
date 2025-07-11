@@ -1,5 +1,14 @@
 ---
 
+# If docker userns is activated, the files that are mounted in the container must have a different uid and gid on the Docker host.
+- name: Determine uid and gid for the directories which are mounted in the container
+  ansible.builtin.set_fact:
+    valkey_host_filesystem_uid: "{{ valkey_uid if not valkey_docker_userns_enabled else (valkey_uid | int + valkey_docker_userns_offset) | string }}"
+    valkey_host_filesystem_gid: "{{ valkey_gid if not valkey_docker_userns_enabled else (valkey_gid | int + valkey_docker_userns_offset) | string }}"
+  when: valkey_enabled | bool
+  tags:
+    - always
+
 - block:
     - when: valkey_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"

@@ -1,14 +1,21 @@
 ---
 
-- name: Ensure Valkey paths exist
+- name: Ensure Valkey base path exists
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ valkey_base_path }}"
     state: directory
     mode: 0750
     owner: "{{ valkey_uid }}"
     group: "{{ valkey_gid }}"
+
+- name: Ensure Valkey data and config path exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0750
+    owner: "{{ valkey_host_filesystem_uid }}"
+    group: "{{ valkey_host_filesystem_gid }}"
   with_items:
-    - "{{ valkey_base_path }}"
     - "{{ valkey_config_path }}"
     - "{{ valkey_data_path }}"
 

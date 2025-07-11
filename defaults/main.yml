@@ -8,6 +8,10 @@ valkey_identifier: valkey
 
 valkey_uid: ''
 valkey_gid: ''
+valkey_host_filesystem_uid: ''
+valkey_host_filesystem_gid: ''
+valkey_docker_userns_enabled: false
+valkey_docker_userns_offset: 0
 
 valkey_connection_password: ""
 
