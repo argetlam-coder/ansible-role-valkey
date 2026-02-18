@@ -1,4 +1,9 @@
-#jinja2: lstrip_blocks: "True"
+{#
+SPDX-FileCopyrightText: 2024 Slavi Pantaleev
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+#}
+
 {% if valkey_connection_password %}
 requirepass {{ valkey_connection_password }}
 {% endif %}

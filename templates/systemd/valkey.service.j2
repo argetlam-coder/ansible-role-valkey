@@ -1,4 +1,10 @@
-#jinja2: lstrip_blocks: "True"
+{#
+SPDX-FileCopyrightText: 2024, 2025 Slavi Pantaleev
+SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+#}
+
 [Unit]
 Description=Valkey ({{ valkey_identifier }})
 {% for service in valkey_systemd_required_services_list %}
@@ -16,24 +22,25 @@ ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_s
 ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ valkey_identifier }} 2>/dev/null || true'
 
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
-			--rm \
-			--name={{ valkey_identifier }} \
-			--log-driver=none \
-			--user={{ valkey_uid }}:{{ valkey_gid }} \
-			--cap-drop=ALL \
-			--read-only \
-			--tmpfs=/tmp:rw,noexec,nosuid,size=100m \
-			--network={{ valkey_container_network }} \
-			{% if valkey_container_valkey_bind_port %}
-			-p {{ valkey_container_valkey_bind_port }}:6379 \
-			{% endif %}
-			--mount type=bind,src={{ valkey_config_path }}/valkey.conf,dst=/usr/local/etc/valkey/valkey.conf,ro \
-			--mount type=bind,src={{ valkey_data_path }},dst=/data \
-			{% for arg in valkey_container_extra_arguments %}
-			{{ arg }} \
-			{% endfor %}
-			{{ valkey_container_image }} \
-			valkey-server /usr/local/etc/valkey/valkey.conf
+      --rm \
+      --name={{ valkey_identifier }} \
+      --log-driver=none \
+      --user={{ valkey_uid }}:{{ valkey_gid }} \
+      --cap-drop=ALL \
+      --read-only \
+      --network={{ valkey_container_network }} \
+      {% if valkey_container_tcp_host_bind_port %}
+      -p {{ valkey_container_tcp_host_bind_port }}:{{ valkey_container_tcp_port }} \
+      {% endif %}
+      --env-file={{ valkey_base_path }}/env \
+      --mount type=bind,src={{ valkey_config_path }}/valkey.conf,dst=/usr/local/etc/valkey/valkey.conf,ro \
+      --mount type=bind,src={{ valkey_data_path }},dst=/data \
+      --tmpfs=/tmp:rw,noexec,nosuid,size={{ valkey_container_tmpfs_tmp_size }} \
+      {% for arg in valkey_container_extra_arguments %}
+      {{ arg }} \
+      {% endfor %}
+      {{ valkey_container_image_self_build_name if valkey_container_image_self_build else valkey_container_image }} \
+      valkey-server /usr/local/etc/valkey/valkey.conf
 
 {% for network in valkey_container_additional_networks %}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ valkey_identifier }}

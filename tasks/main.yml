@@ -1,5 +1,8 @@
----
+# SPDX-FileCopyrightText: 2023 - 2024 Slavi Pantaleev
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
+---
 # If docker userns is activated, the files that are mounted in the container must have a different uid and gid on the Docker host.
 - name: Determine uid and gid for the directories which are mounted in the container
   ansible.builtin.set_fact:
@@ -8,22 +11,25 @@
   when: valkey_enabled | bool
   tags:
     - always
-
-- block:
-    - when: valkey_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
-
-    - when: valkey_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+    
+- name: Perform Valkey installation tasks
+  when: valkey_enabled | bool
   tags:
     - setup-all
     - setup-valkey
     - install-all
     - install-valkey
+  block:
+    - name: Validate Valkey configuration
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+    - name: Install Valkey
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
-- block:
-    - when: not valkey_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
+- name: Perform Valkey uninstallation tasks
+  when: not valkey_enabled | bool
   tags:
     - setup-all
     - setup-valkey
+  block:
+    - name: Uninstall Valkey
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
