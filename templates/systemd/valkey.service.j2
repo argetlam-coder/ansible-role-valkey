@@ -24,7 +24,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
       --name={{ valkey_identifier }} \
       --log-driver=none \
-      --user={{ valkey_uid }}:{{ valkey_gid }} \
+      --user={{ valkey_container_uid }}:{{ valkey_container_gid }} \
       --cap-drop=ALL \
       --read-only \
       --network={{ valkey_container_network }} \

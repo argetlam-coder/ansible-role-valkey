@@ -20,6 +20,12 @@ valkey_version: 9.1.3
 valkey_uid: ""
 valkey_gid: ""
 
+# Controls the user that the container runs as. Set to `0` to run as root.
+valkey_container_uid: "{{ valkey_uid }}"
+
+# Controls the group that the container runs as. Set to `0` to run as root.
+valkey_container_gid: "{{ valkey_gid }}"
+
 valkey_container_image: "{{ valkey_container_image_registry_prefix }}valkey/valkey:{{ valkey_container_image_tag }}"
 valkey_container_image_tag: "{{ valkey_version }}-alpine"
 valkey_container_image_registry_prefix: "{{ valkey_container_image_registry_prefix_upstream }}"
